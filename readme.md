@@ -9,15 +9,21 @@ Technical test completed by Michael Mulvogue
 
 ## Features
 
-- ASP.NET Core api
-    - API key authentication
-    - Rate limiting
-    - Integration with OpenWeatherMap.com
-- React web app
-    - Using standalone react app template in Visual Studio
-    - Integrates with the api using the http-proxy-middleware library
+ASP.NET Core api
+- [x] Integration with OpenWeatherMap.com
+- [x] Request validation 
+- [ ] API key authentication
+- [ ] Rate limiting    
+- [x] Logging
+- [x] Error handling
 
-
+React web app
+- [ ] Setup basic UI with Bootstrap
+- [ ] Create form for input to weather api
+- [ ] Input validation
+- [ ] Integrate with weather api
+- [ ] Setup api key auth
+- [ ] Error handling
 
 ## Run Locally
 
@@ -60,12 +66,6 @@ Install dependencies
 
 ```powershell
   npm install
-```
-
-Allow dotnet dev webserver https cert
-
-```powershell
-  npm run pre-start
 ```
 
 Start the server

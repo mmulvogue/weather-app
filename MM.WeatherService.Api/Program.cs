@@ -1,4 +1,6 @@
 using System.Reflection;
+using Microsoft.OpenApi.Models;
+using MM.WeatherService.Api.ApiKeyAuth;
 using MM.WeatherService.Api.OpenWeatherMapApi;
 using Serilog;
 using Serilog.Events;
@@ -23,10 +25,35 @@ try
     builder.Services.AddControllers();
 
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(options =>
+    builder.Services.AddSwaggerGen(setup =>
     {
+        // Use XML comments to populate open api spec
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+        // Add api key security scheme
+        setup.AddSecurityDefinition(ApiKeyAuthenticationOptions.SchemeName, new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Name = "x-api-key",
+            Type = SecuritySchemeType.ApiKey
+        });
+
+        // Require API key auth for all endpoints
+        setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = ApiKeyAuthenticationOptions.SchemeName
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
     });
 
 
@@ -35,6 +62,13 @@ try
     builder.Services.Configure<OpenWeatherMapApiClientOptions>(
         builder.Configuration.GetSection(OpenWeatherMapApiClientOptions.SectionName)
     );
+
+    builder.Services.AddAuthentication(ApiKeyAuthenticationOptions.SchemeName)
+        .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+            ApiKeyAuthenticationOptions.SchemeName,
+            (options) => { options.HeaderName = "x-api-key"; }
+        );
+    builder.Services.AddTransient<IApiKeyService, ApiKeyService>();
 
     var app = builder.Build();
 
@@ -53,6 +87,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();

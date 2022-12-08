@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MM.WeatherService.Api.Models;
 using MM.WeatherService.Api.OpenWeatherMapApi;
@@ -6,6 +7,7 @@ using MM.WeatherService.Api.OpenWeatherMapApi;
 namespace MM.WeatherService.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class WeatherController : ControllerBase
 {
