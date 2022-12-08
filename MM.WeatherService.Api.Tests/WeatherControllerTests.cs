@@ -5,55 +5,55 @@ using MM.WeatherService.Api.OpenWeatherMapApi;
 using MM.WeatherService.Api.OpenWeatherMapApi.Models;
 using Moq;
 
-namespace MM.WeatherService.Api.Tests
+namespace MM.WeatherService.Api.Tests;
+
+public class WeatherControllerTests
 {
-    public class WeatherControllerTests
+    [Fact]
+    public async Task GetCurrentWeatherAsync_WhenNoWeatherData_ReturnsNotFound()
     {
-        [Fact]
-        public async Task GetCurrentWeatherAsync_WhenNoWeatherData_ReturnsNotFound()
+        //Arrange
+        var mockWeatherApiClient = new Mock<IOpenWeatherMapApiClient>();
+        mockWeatherApiClient.Setup(x => x.GetCurrentWeatherForCityAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(() => null);
+
+        //Act
+        var controller = new WeatherController(
+            new Mock<ILogger<WeatherController>>().Object,
+            mockWeatherApiClient.Object
+        );
+        var actionResult = await controller.GetCurrentWeatherAsync("dummyCity", "dummyCountry");
+
+        //Assert
+        Assert.IsType<NotFoundResult>(actionResult);
+    }
+
+    [Fact]
+    public async Task GetCurrentWeatherAsync_WhenWeatherDataFound_ReturnsOkResult()
+    {
+        //Arrange
+        var dummyWeatherData = new CurrentWeather
         {
-            //Arrange
-            var mockWeatherApiClient = new Mock<IOpenWeatherMapApiClient>();
-            mockWeatherApiClient.Setup(x => x.GetCurrentWeatherForCityAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(() => null);
-
-            //Act
-            var controller = new WeatherController(
-                new Mock<ILogger<WeatherController>>().Object,
-                mockWeatherApiClient.Object
-            );
-            var actionResult = (await controller.GetCurrentWeatherAsync("dummyCity", "dummyCountry"));
-
-            //Assert
-            Assert.IsType<NotFoundResult>(actionResult);
-        }
-
-        [Fact]
-        public async Task GetCurrentWeatherAsync_WhenWeatherDataFound_ReturnsOkResult()
-        {
-            //Arrange
-            var dummyWeatherData = new CurrentWeather
+            Weather = new[]
             {
-                Weather = new[] {
-                    new WeatherCondition
-                    {
-                        Description = "Dummy weather description"
-                    }
+                new WeatherCondition
+                {
+                    Description = "Dummy weather description"
                 }
-            };
-            var mockWeatherApiClient = new Mock<IOpenWeatherMapApiClient>();
-            mockWeatherApiClient.Setup(x => x.GetCurrentWeatherForCityAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(() => dummyWeatherData);
+            }
+        };
+        var mockWeatherApiClient = new Mock<IOpenWeatherMapApiClient>();
+        mockWeatherApiClient.Setup(x => x.GetCurrentWeatherForCityAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(() => dummyWeatherData);
 
-            //Act
-            var controller = new WeatherController(
-                new Mock<ILogger<WeatherController>>().Object,
-                mockWeatherApiClient.Object
-            );
-            var actionResult = (await controller.GetCurrentWeatherAsync("dummyCity", "dummyCountry"));
+        //Act
+        var controller = new WeatherController(
+            new Mock<ILogger<WeatherController>>().Object,
+            mockWeatherApiClient.Object
+        );
+        var actionResult = await controller.GetCurrentWeatherAsync("dummyCity", "dummyCountry");
 
-            //Assert
-            Assert.IsType<OkObjectResult>(actionResult);
-        }
+        //Assert
+        Assert.IsType<OkObjectResult>(actionResult);
     }
 }
