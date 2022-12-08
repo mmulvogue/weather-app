@@ -4,6 +4,6 @@ public class OpenWeatherMapApiClientOptions
 {
     internal const string SectionName = "OpenWeatherMapApiClient";
 
-    public string? ApiBaseUrl{ get; set; }
+    public string? ApiBaseUrl { get; set; }
     public string? ApiKey { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace MM.WeatherService.Api.OpenWeatherMapApi.Models
+﻿namespace MM.WeatherService.Api.OpenWeatherMapApi.Models;
+
+public class CurrentWeather
 {
-    public class CurrentWeather
-    {
-        public WeatherCondition[] Weather { get; set; }
-    }
+    public WeatherCondition[] Weather { get; set; }
 }

@@ -2,42 +2,41 @@
 using MM.WeatherService.Api.OpenWeatherMapApi.Models;
 using RestSharp;
 
-namespace MM.WeatherService.Api.OpenWeatherMapApi
+namespace MM.WeatherService.Api.OpenWeatherMapApi;
+
+public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
 {
-    public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
+    private readonly RestClient _client;
+    private readonly OpenWeatherMapApiClientOptions _config;
+    private readonly ILogger<OpenWeatherMapApiClient> _logger;
+
+    public OpenWeatherMapApiClient(
+        IOptions<OpenWeatherMapApiClientOptions> options,
+        ILogger<OpenWeatherMapApiClient> logger
+    )
     {
-        private readonly ILogger<OpenWeatherMapApiClient> _logger;
-        private readonly RestClient _client;
-        private readonly OpenWeatherMapApiClientOptions _config;
+        _logger = logger;
+        _config = options.Value;
 
-        public OpenWeatherMapApiClient(
-            IOptions<OpenWeatherMapApiClientOptions> options,
-            ILogger<OpenWeatherMapApiClient> logger
-        )
+        var clientOptions = new RestClientOptions(_config.ApiBaseUrl);
+        _client = new RestClient(clientOptions);
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+
+    public async Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode)
+    {
+        var response = await _client.GetJsonAsync<CurrentWeather>("data/2.5/weather", new
         {
-            _logger = logger;
-            _config = options.Value;
+            q = $"{cityName},{countryCode}",
+            appid = _config.ApiKey
+        });
 
-            var clientOptions = new RestClientOptions(_config.ApiBaseUrl);
-            _client = new RestClient(clientOptions);
-        }
+        _logger.LogDebug("GetCurrentWeatherForCity response: {@CurrentWeatherResponse}", response);
 
-        public async Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode)
-        {
-            var response = await _client.GetJsonAsync<CurrentWeather>("data/2.5/weather", new
-            {
-                q = $"{cityName},{countryCode}",
-                appid = _config.ApiKey
-            });
-
-            _logger.LogDebug("GetCurrentWeatherForCity response: {@CurrentWeatherResponse}", response);
-            
-            return response;
-        }
-
-        public void Dispose()
-        {
-            _client.Dispose();
-        }
+        return response;
     }
 }

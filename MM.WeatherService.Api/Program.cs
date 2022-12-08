@@ -1,13 +1,13 @@
+using System.Reflection;
 using MM.WeatherService.Api.OpenWeatherMapApi;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 
 
 // Configure SeriLog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft",LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
     .WriteTo.Console()
     .CreateLogger();
@@ -15,20 +15,20 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    
+
     // Clear standard logging config and add SeriLog provider
     builder.Logging.ClearProviders();
     builder.Logging.AddSerilog();
 
     builder.Services.AddControllers();
-    
+
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen((options) =>
+    builder.Services.AddSwaggerGen(options =>
     {
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     });
-    
+
 
     // Setup application services
     builder.Services.AddSingleton<IOpenWeatherMapApiClient, OpenWeatherMapApiClient>();
@@ -38,7 +38,7 @@ try
 
     var app = builder.Build();
 
-    
+
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
