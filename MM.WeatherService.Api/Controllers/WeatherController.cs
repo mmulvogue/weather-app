@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using MM.WeatherService.Api.Models;
 using MM.WeatherService.Api.OpenWeatherMapApi;
 
 namespace MM.WeatherService.Api.Controllers
@@ -20,25 +21,33 @@ namespace MM.WeatherService.Api.Controllers
             _weatherMapApiClient = weatherMapApiClient;
         }
 
+        /// <summary>
+        /// Returns a description of the current weather for the requested city
+        /// </summary>
+        /// <param name="city">Name of city to retrieve weather for</param>
+        /// <param name="country">Short or full name of country the city is in</param>
+        /// <returns></returns>
         [HttpGet()]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WeatherDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAsync(
-            [Required] string city,
-            [Required] string country
+        public async Task<IActionResult> GetCurrentWeatherAsync(
+            [Required] [FromQuery] string city,
+            [Required] [FromQuery] string country
         )
         {
-            _logger.LogDebug("Requested weather for: {city}, {country}", city,country);
+            _logger.LogDebug("Requested weather for: {city}, {country}", city, country);
+
             var currentWeather = await _weatherMapApiClient.GetCurrentWeatherForCityAsync(city, country);
-            if (currentWeather?.Weather?.Count > 0)
+            if (currentWeather?.Weather?.Length > 0)
             {
-                return Ok(currentWeather?.Weather[0].Description);
+                return Ok(new WeatherDto()
+                {
+                    Description = currentWeather.Weather.First().Description
+                });
             }
-            else
-            {
-                return NotFound();
-            }
+
+            return NotFound();
         }
     }
 }

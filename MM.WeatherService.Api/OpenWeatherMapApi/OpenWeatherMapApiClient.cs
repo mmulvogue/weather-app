@@ -1,15 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
+using MM.WeatherService.Api.OpenWeatherMapApi.Models;
 using RestSharp;
-using RestSharp.Serializers.Json;
-using System.Text.Json;
 
 namespace MM.WeatherService.Api.OpenWeatherMapApi
 {
-    public interface IOpenWeatherMapApiClient
-    {
-        Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode);
-    }
-
     public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
     {
         private readonly ILogger<OpenWeatherMapApiClient> _logger;
@@ -22,37 +16,28 @@ namespace MM.WeatherService.Api.OpenWeatherMapApi
         )
         {
             _logger = logger;
-
-            var clientOptions = new RestClientOptions("https://api.openweathermap.org/data/2.5");
-            _client = new RestClient(clientOptions);
-
             _config = options.Value;
-            _logger.LogInformation($"OpenWeatherMapApiClient initialised. ApiKey: {_config.ApiKey}");
+
+            var clientOptions = new RestClientOptions(_config.ApiBaseUrl);
+            _client = new RestClient(clientOptions);
         }
 
         public async Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode)
         {
-            var response = await _client.GetJsonAsync<CurrentWeather>("weather", new
+            var response = await _client.GetJsonAsync<CurrentWeather>("data/2.5/weather", new
             {
                 q = $"{cityName},{countryCode}",
                 appid = _config.ApiKey
             });
 
-            _logger.LogDebug("GetCurrentWeatherForCity response: {@Response}", response);
+            _logger.LogDebug("GetCurrentWeatherForCity response: {@CurrentWeatherResponse}", response);
             
             return response;
         }
 
         public void Dispose()
         {
-            _client?.Dispose();
+            _client.Dispose();
         }
-    }
-
-    public class OpenWeatherMapApiClientOptions
-    {
-        internal const string SectionName = "OpenWeatherMapApiClient";
-
-        public string? ApiKey { get; set; }
     }
 }

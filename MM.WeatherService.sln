@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MM.WeatherService.Api", "MM.WeatherService.Api\MM.WeatherService.Api.csproj", "{AD90D42B-1171-4A9A-B253-0E1A67DF6E00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MM.WeatherService.Api", "MM.WeatherService.Api\MM.WeatherService.Api.csproj", "{AD90D42B-1171-4A9A-B253-0E1A67DF6E00}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "mm-weatherservice-app", "mm-weatherservice-app\mm-weatherservice-app.esproj", "{2D7EEA15-619C-420F-BCF9-297E9FF28E35}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		readme.md = readme.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MM.WeatherService.Api.Tests", "MM.WeatherService.Api.Tests\MM.WeatherService.Api.Tests.csproj", "{B5A8C4DE-7BCD-4DC9-8182-BFEB3D9632D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +30,10 @@ Global
 		{2D7EEA15-619C-420F-BCF9-297E9FF28E35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D7EEA15-619C-420F-BCF9-297E9FF28E35}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D7EEA15-619C-420F-BCF9-297E9FF28E35}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B5A8C4DE-7BCD-4DC9-8182-BFEB3D9632D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A8C4DE-7BCD-4DC9-8182-BFEB3D9632D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A8C4DE-7BCD-4DC9-8182-BFEB3D9632D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A8C4DE-7BCD-4DC9-8182-BFEB3D9632D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
