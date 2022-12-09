@@ -1,4 +1,5 @@
 using System.Reflection;
+using MM.WeatherService.Api.ApiKeyAuth;
 using MM.WeatherService.Api.OpenWeatherMapApi;
 using Serilog;
 using Serilog.Events;
@@ -22,20 +23,26 @@ try
 
     builder.Services.AddControllers();
 
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(options =>
-    {
-        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-    });
+    // Setup custom api key auth service
+    builder.Services.AddApiKeyAuthentication("x-api-key");
 
+    // Setup Swagger/OAS
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(setup =>
+    {
+        // Use XML comments to populate spec
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+        // Add api key security requirement
+        setup.AddApiKeySecurityRequirement("x-api-key");
+    });
 
     // Setup application services
     builder.Services.AddSingleton<IOpenWeatherMapApiClient, OpenWeatherMapApiClient>();
     builder.Services.Configure<OpenWeatherMapApiClientOptions>(
         builder.Configuration.GetSection(OpenWeatherMapApiClientOptions.SectionName)
     );
-
     var app = builder.Build();
 
 
@@ -53,6 +60,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
