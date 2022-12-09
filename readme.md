@@ -12,7 +12,12 @@ Technical test completed by Michael Mulvogue
 ASP.NET Core api
 - [x] Integration with OpenWeatherMap.com
 - [x] Request validation 
-- [ ] Rate limiting    
+- [ ] Rate limiting - AspNetCoreRateLimiter NuGet package
+- [ ] Rate limiting - Own implementation
+	- Cache to store counter value per client/api key that expires 1 hr after created
+	- MiddleWare to increment counter for each request
+	- Locking for counter updates
+	- Distributed cache for current counter value
 - [x] API key authentication
 - [x] Logging
 - [x] Error handling
