@@ -12,8 +12,8 @@ Technical test completed by Michael Mulvogue
 ASP.NET Core api
 - [x] Integration with OpenWeatherMap.com
 - [x] Request validation 
-- [ ] API key authentication
 - [ ] Rate limiting    
+- [x] API key authentication
 - [x] Logging
 - [x] Error handling
 
