@@ -1,6 +1,7 @@
 using System.Reflection;
 using MM.WeatherService.Api.ApiKeyAuth;
 using MM.WeatherService.Api.OpenWeatherMapApi;
+using MM.WeatherService.Api.RateLimiter;
 using Serilog;
 using Serilog.Events;
 
@@ -43,6 +44,8 @@ try
     builder.Services.Configure<OpenWeatherMapApiClientOptions>(
         builder.Configuration.GetSection(OpenWeatherMapApiClientOptions.SectionName)
     );
+    builder.Services.AddMemoryCache();
+    builder.Services.AddSingleton<IApiClientStatisticsStore, InMemoryApiClientStatisticsStore>();
     var app = builder.Build();
 
 
@@ -63,6 +66,8 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.UseMiddleware<RateLimitingMiddleware>();
+
     app.MapControllers();
 
     app.Run();
@@ -75,3 +80,4 @@ finally
 {
     Log.CloseAndFlush();
 }
+public partial class Program { }

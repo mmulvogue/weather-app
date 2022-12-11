@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "MM.WeatherService.Api.IntegrationTests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:58842;http://localhost:58843"
+    }
+  }
+}

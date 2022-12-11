@@ -58,7 +58,11 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
             Name = $"DummyKeyOwner of {apiKey}"
         };
 
-        var claims = new[] { new Claim(ClaimTypes.Name, apiKeyOwner.Name) };
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, apiKey),
+            new Claim(ClaimTypes.Name, apiKeyOwner.Name)
+        };
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var identities = new List<ClaimsIdentity> { identity };
         var principal = new ClaimsPrincipal(identities);
