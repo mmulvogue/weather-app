@@ -14,9 +14,9 @@ public class InMemoryApiClientStatisticsStore : IApiClientStatisticsStore
         _cache = cache;
     }
 
-    public Task<ApiClientStatistics> GetAsync(string clientId)
+    public Task<ApiClientStatistics?> GetAsync(string clientId)
     {
-        return Task.FromResult(_cache.Get<ApiClientStatistics>($"{CacheKeyPrefix}:{clientId}"));
+        return Task.FromResult(_cache.Get<ApiClientStatistics?>($"{CacheKeyPrefix}:{clientId}"));
     }
 
     public Task SetAsync(string clientId, ApiClientStatistics clientStatistics, TimeSpan expiry)

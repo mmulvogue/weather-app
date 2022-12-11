@@ -1,9 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MM.WeatherService.Api.ApiKeyAuth;
-using MM.WeatherService.Api.Controllers;
-using MM.WeatherService.Api.OpenWeatherMapApi;
-using MM.WeatherService.Api.OpenWeatherMapApi.Models;
 using Moq;
 
 namespace MM.WeatherService.Api.Tests;

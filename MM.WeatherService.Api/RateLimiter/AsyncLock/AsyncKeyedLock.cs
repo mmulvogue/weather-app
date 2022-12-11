@@ -28,14 +28,10 @@ public class AsyncKeyedLock
 
         // Add a new lock object if it doesn't exist already for the current key
         // Uses a retry logic to allow for concurrency
-        var toAdd = new ActiveLock
+        var toAdd = new ActiveLock(new AsyncLock
         {
-            Lock = new AsyncLock
-            {
-                OnRelease = () => OnLockRelease(key)
-            },
-            ReferenceCount = 1
-        };
+            OnRelease = () => OnLockRelease(key)
+        });
 
         if (_activeLocks.TryAdd(key, toAdd)) return toAdd.Lock;
 
@@ -84,7 +80,12 @@ public class AsyncKeyedLock
 
     internal class ActiveLock
     {
+        public ActiveLock(AsyncLock asyncLock)
+        {
+            ReferenceCount = 1;
+            Lock = asyncLock;
+        }
         public int ReferenceCount { get; set; }
-        public AsyncLock Lock { get; set; }
+        public AsyncLock Lock { get; private set; }
     }
 }

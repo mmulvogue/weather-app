@@ -2,5 +2,5 @@
 
 public class CurrentWeather
 {
-    public WeatherCondition[] Weather { get; set; }
+    public WeatherCondition[]? Weather { get; set; }
 }
