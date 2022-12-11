@@ -4,6 +4,11 @@ using RestSharp;
 
 namespace MM.WeatherService.Api.OpenWeatherMapApi;
 
+public interface IOpenWeatherMapApiClient
+{
+    Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode);
+}
+
 public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
 {
     private readonly RestClient _client;
@@ -17,6 +22,11 @@ public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
     {
         _logger = logger;
         _config = options.Value;
+
+        if (_config?.ApiBaseUrl == null)
+        {
+            throw new ArgumentNullException("ApiBaseUrl from OpenWeatherMapApiClientOptions cannot be null");
+        }
 
         var clientOptions = new RestClientOptions(_config.ApiBaseUrl);
         _client = new RestClient(clientOptions);

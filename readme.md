@@ -1,59 +1,45 @@
 
 # Weather service
 
-Web app and api that integrates with OpenWeatherMap API to retrieve the current 
-weather prediction for a city.
-
-Technical test completed by Michael Mulvogue
-
+A web app and api that integrates with OpenWeatherMap API to retrieve the current weather prediction for a requested city.
 
 ## Features
+The api uses .NET 6 and the web app uses React v18.2
 
-ASP.NET Core api
-- [x] Integration with OpenWeatherMap.com
-- [x] Request validation 
-- [ ] Rate limiting - AspNetCoreRateLimiter NuGet package
-- [ ] Rate limiting - Own implementation
-	- Cache to store counter value per client/api key that expires 1 hr after created
-	- MiddleWare to increment counter for each request
-	- Locking for counter updates
-	- Distributed cache for current counter value
-- [x] API key authentication
-- [x] Logging
-- [x] Error handling
+### Api key authentication
+This feature was added using a custom authentication handler that extends from `AuthenticationHandler`.
+The underlying data store for api keys is just a hard-coded array for simplicity inside the `HardCodedApiKeyStore` class.
+The keys are prefixed with `API-` to allow for a simple shape based validation rule to limit data store calls.
 
-React web app
-- [x] Setup basic UI with Bootstrap
-- [x] Create form for input to weather api
-- [x] Input validation
-- [x] Integrate with weather api
-- [x] Setup api key auth
-- [x] Error handling
-- [x] Unit tests
+### Rate limiter
+.NET 7 now comes with rate limiting built-in and there is also an open source library called AspNetCoreRateLimit that provides this feature.
+So I would most likely use those two solutions before custom building this. 
+
+However using a library felt like cheating for a technical test 
+so I have built a custom solution in this project.
+
+This feature was added using a custom middleware that utilises the api key as a client id and tracks the number of requests made between a fixed time window.
+The underlying data store for the client request count is the MemoryCache, however this would likely need a distributed cache like Redis/Memcached in a real solution.
+
+Concurrency issues around updating the client request count have been solved here with a wrapper around the SemaphoreSlim lock as well as key based locking to allow concurrent updates for different api keys. The implementation for the AsyncKeyedLock was derived from these two projects:
+ - https://github.com/SixLabors/ImageSharp.Web/
+ - https://github.com/stefanprodan/AspNetCoreRateLimit
 
 ## Run Locally
+
+The .NET 6 runtime and SDK will need to be installed, I used the version installed by Visual Studio setup. Node.js also needs to be installed, I used v18.12 installed via NVM for windows.
 
 Clone the project
 
 ```powershell
-  git clone https://link-to-project
+  git clone https://github.com/mmulvogue/weather-app.git
 ```
 
-### From Visual Studio
-Open the solution in Visual Studio (I used VS 2022)
-
-Launch the api project (MM.WeatherService.Api) without debugging (Ctrl+F5)
-
-Launch the app project (mm-weatherservice-app) without debugging (Ctrl+F5)
-
-
-### From command line
-
-#### Start api
+**Start api**
 
 Open the api project in the clone location
 ```powershell
-  cd <clone-location>/MM.WeatherService.Api
+  cd <clone-location>\MM.WeatherService.Api
 ```
 
 Start the server
@@ -62,11 +48,11 @@ Start the server
   dotnet run
 ```
 
-#### Start web app
+**Start web app**
 
 Open the web app project in the clone location
 ```powershell
-  cd <clone-location>/mm-weatherservice-app
+  cd <clone-location>\mm-weatherservice-app
 ```
 
 Install dependencies
@@ -78,14 +64,24 @@ Install dependencies
 Start the server
 
 ```powershell
-  npm run start
+  npm start
 ```
+### From Visual Studio
+Open the solution in Visual Studio (I used VS 2022)
 
+Ensure the Start-up projects for the solution is set to current selection
+
+Select the api project (MM.WeatherService.Api) and launch without debugging (Ctrl+F5)
+
+Select the app project (mm-weatherservice-app) and launch without debugging (Ctrl+F5)
 
 ## Running Tests
 
 ### Api
-To run the api tests, run the following
+The integration tests for the api depend on the hard coded apikey values 
+and having the rate limiter set to a 5 request limit
+
+To run the all the test suites:
 
 Open the web project 
 ```powershell
@@ -98,12 +94,14 @@ Start the tests
 ```
 
 ### Web app
-To run the web app tests
+To run the web app tests:
 
 Open the web project 
 ```powershell
-  cd <clone-location>/mm-weatherservice-app  
+  cd <clone-location>\mm-weatherservice-app  
 ```
 
 Start the tests
 ```powershell
+  npm run test
+```

@@ -29,20 +29,29 @@ public class RateLimiterMiddleware
     {
         // Identify client using api key
         var clientId = GetClientId(context);
+        if (clientId != null)
+        {
+            // Concurrent threads trying to run the below for the the same clientId
+            // need to wait until lock is released for that clientId
+            var stats = await GetUpdatedStatistics(clientId);
 
-        // Concurrent threads trying to run the below for the the same clientId
-        // need to wait until lock is released for that clientId
-        var stats = await GetUpdatedStatistics(clientId);
-
-        if (stats.RequestCounterStartTime + TimeSpan.FromMinutes(_options.RequestLimitWindowMinutes) > DateTime.UtcNow)
-            // If client has used more than allowed requests in time window
-            if (stats.RequestCounter > _options.RequestLimit)
+            if (stats.RequestCounterStartTime + TimeSpan.FromMinutes(_options.RequestLimitWindowMinutes) >
+                DateTime.UtcNow)
             {
-                _logger.LogWarning($"Request rate limit reached by client: {clientId}");
-                await ReturnTooManyRequestsResponse(context,
-                    stats.RequestCounterStartTime + TimeSpan.FromMinutes(_options.RequestLimitWindowMinutes));
-                return;
+                // If client has used more than allowed requests in time window
+                if (stats.RequestCounter > _options.RequestLimit)
+                {
+                    _logger.LogWarning($"Request rate limit reached by client: {clientId}");
+                    await ReturnTooManyRequestsResponse(context,
+                        stats.RequestCounterStartTime + TimeSpan.FromMinutes(_options.RequestLimitWindowMinutes));
+                    return;
+                }
             }
+        }
+        else
+        {
+            _logger.LogWarning("Received request with no client identity, unable to apply rate limiting");
+        }
 
         await _next.Invoke(context);
     }

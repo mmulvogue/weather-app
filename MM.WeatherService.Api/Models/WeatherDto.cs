@@ -8,5 +8,5 @@ public class WeatherDto
     /// <summary>
     ///     Human readable description of the weather
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 }
