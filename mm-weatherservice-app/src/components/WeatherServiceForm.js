@@ -23,7 +23,7 @@ export default class WeatherServiceForm extends Component {
             processing: false,
             showWeather: false,
             weatherResult: null,
-            weatherDescription: ''
+            weatherData: {}
         };
 
         this.handleFormInputChange = this.handleFormInputChange.bind(this);
@@ -47,6 +47,8 @@ export default class WeatherServiceForm extends Component {
         event.stopPropagation();
 
         const form = event.currentTarget;
+        const requestCityName = this.state.cityName;
+        const requestCountryName = this.state.countryName;
         if (form.checkValidity() !== false) {
             this.setState({
                 processing: true,
@@ -54,28 +56,30 @@ export default class WeatherServiceForm extends Component {
             });
             try {
                 const response = await fetch('weather?' + new URLSearchParams({
-                    city: this.state.cityName,
-                    country: this.state.countryName,
+                    city: requestCityName,
+                    country: requestCountryName,
                 }));
 
                 console.log(response);
                 if (response.status === 200) {
                     const weatherData = await response.json();
                     this.setState({
-                        weatherDescription: weatherData.description,
+                        weatherData: {
+                            description: weatherData.description,
+                            requestCityName,
+                            requestCountryName
+                        },
                         weatherResult: WeatherResultTypes.Success
-                    });
-                }
-                else if (response.status === 404) {
-                    this.setState({
-                        weatherDescription: '',
-                        weatherResult: WeatherResultTypes.NotFound
                     });
                 }
                 else {
                     this.setState({
-                        weatherDescription: '',
-                        weatherResult: WeatherResultTypes.Error
+                        weatherData: {
+                            description: '',
+                            requestCityName,
+                            requestCountryName
+                        },
+                        weatherResult: response.status === 404 ? WeatherResultTypes.NotFound : WeatherResultTypes.Error
                     });
                 }
 
@@ -93,14 +97,14 @@ export default class WeatherServiceForm extends Component {
         if (this.state.weatherResult === WeatherResultTypes.Success) {
             return (
                 <Alert variant="success" className="mt-3">
-                    <p className="mb-0">The current weather for <em> {this.state.cityName}, {this.state.countryName}</em> is: <strong>{this.state.weatherDescription}</strong></p>
+                    <p className="mb-0">The current weather for <em> {this.state.weatherData.requestCityName}, {this.state.weatherData.requestCountryName}</em> is: <strong>{this.state.weatherData.description}</strong></p>
                 </Alert>
             );
         }
         else if (this.state.weatherResult === WeatherResultTypes.NotFound) {
             return (
                 <Alert variant="warning" className="mt-3">
-                    <p>No weather was found for <em> {this.state.cityName}, {this.state.countryName}</em></p>
+                    <p>No weather was found for <em> {this.state.weatherData.requestCityName}, {this.state.weatherData.requestCountryName}</em></p>
                     <p className="mb-0">Check the city and country are correct and try again.</p>
                 </Alert>
             );
@@ -108,7 +112,7 @@ export default class WeatherServiceForm extends Component {
         else if (this.state.weatherResult === WeatherResultTypes.Error) {
             return (
                 <Alert variant="danger" className="mt-3">
-                    <p className="mb-0">Sorry, an error occured retrieving weather for <em> {this.state.cityName}, {this.state.countryName}</em></p>
+                    <p className="mb-0">Sorry, an error occured retrieving weather for <em> {this.state.weatherData.requestCityName}, {this.state.weatherData.requestCountryName}</em></p>
                 </Alert>
             );
         }
