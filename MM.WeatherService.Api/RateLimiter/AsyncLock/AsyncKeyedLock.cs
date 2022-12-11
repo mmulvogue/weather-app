@@ -6,6 +6,12 @@ namespace MM.WeatherService.Api.RateLimiter.AsyncLock;
 ///     Manages locks that are specific to a provided key.
 ///     Allows lock requests using different keys to execute concurrently
 /// </summary>
+/// <remarks>
+/// The implementation of this has been derived from 
+/// https://github.com/SixLabors/ImageSharp.Web/
+/// and
+/// https://github.com/stefanprodan/AspNetCoreRateLimit
+/// </remarks>
 public class AsyncKeyedLock
 {
     private readonly ConcurrentDictionary<string, ActiveLock> _activeLocks = new();
