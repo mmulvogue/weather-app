@@ -4,6 +4,11 @@ using RestSharp;
 
 namespace MM.WeatherService.Api.OpenWeatherMapApi;
 
+public interface IOpenWeatherMapApiClient
+{
+    Task<CurrentWeather?> GetCurrentWeatherForCityAsync(string cityName, string countryCode);
+}
+
 public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient, IDisposable
 {
     private readonly RestClient _client;
