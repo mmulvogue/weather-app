@@ -42,6 +42,15 @@ Open the api project in the clone location
   cd <clone-location>\MM.WeatherService.Api
 ```
 
+Ensure the open weather map api key is set in the `appsettings.Development.json` file
+```json
+{
+  "OpenWeatherMapApiClient": {
+    "ApiKey": "<Replace with OpenWeatherMap api key>"
+  }
+}
+```
+
 Start the server
 
 ```powershell
